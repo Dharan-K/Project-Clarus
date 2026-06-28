@@ -1,0 +1,39 @@
+# Render Blueprint — deploys Clarus to Render.com
+# Docs: https://render.com/docs/blueprint-spec
+#
+# This creates TWO services:
+#   1. clarus-agents   — the FastAPI AI agents (gives UiPath a PERMANENT URL,
+#                        so you no longer need the cloudflare tunnel)
+#   2. clarus-console  — the React dashboard (a static site)
+
+services:
+  # ---------------------------------------------------------------
+  # 1) AI Agents (FastAPI)  ->  https://clarus-agents.onrender.com
+  #    Use  <that-url>/demo  in your UiPath "Call AI agents" box.
+  # ---------------------------------------------------------------
+  - type: web
+    name: clarus-agents
+    runtime: python
+    rootDir: agents
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: OPENROUTER_API_KEY
+        sync: false          # set this secret in the Render dashboard
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+
+  # ---------------------------------------------------------------
+  # 2) The Console (React static site)
+  # ---------------------------------------------------------------
+  - type: web
+    name: clarus-console
+    runtime: static
+    buildCommand: npm ci --include=dev && npm run build
+    staticPublishPath: ./dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
