@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
+import { LiveAgentDemo } from "@/components/console/LiveAgentDemo";
 import { INVOICES, invoiceTotal } from "@/data/invoices";
 import { formatCurrency } from "@/lib/utils";
 
@@ -53,6 +54,11 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Live agent run — calls the real deployed agents */}
+      <div className="mt-6">
+        <LiveAgentDemo />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">

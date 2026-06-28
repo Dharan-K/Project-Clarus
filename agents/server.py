@@ -17,11 +17,20 @@ from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from clarus_agents import extract_invoice, three_way_match, triage_exception
 
 app = FastAPI(title="Clarus Agents", version="0.1.0")
+
+# Allow the Console (and any browser) to call these read-only endpoints directly.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 SAMPLES = Path(__file__).parent / "sample_data"
 
