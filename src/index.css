@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 /*
- * ============================================================================
+ * =============================================================================
  * GLOBAL THEME VARIABLES
- * ============================================================================
+ * =============================================================================
  *
  * The application uses HSL color values stored as CSS custom properties.
  * Tailwind can consume these variables using the `hsl(var(--variable))`
