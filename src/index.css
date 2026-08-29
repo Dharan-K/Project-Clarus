@@ -2,71 +2,178 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * ============================================================================
+ * GLOBAL THEME VARIABLES
+ * ============================================================================
+ *
+ * The application uses HSL color values stored as CSS custom properties.
+ * Tailwind can consume these variables using the `hsl(var(--variable))`
+ * pattern.
+ *
+ * The overall visual style is based on a dark indigo/purple "MotionSites"
+ * aesthetic with glassmorphism effects.
+ */
 :root {
   /* ---- MotionSites palette (HSL triplets) ---- */
-  --background: 260 87% 3%; /* deep dark blue-purple */
-  --foreground: 40 6% 95%; /* off-white */
+
+  /* Main page background: deep dark blue-purple */
+  --background: 260 87% 3%;
+
+  /* Default foreground/text color: soft off-white */
+  --foreground: 40 6% 95%;
+
+  /* Secondary text used in hero sections */
   --hero-sub: 40 6% 82%;
 
+  /* Card/surface background and corresponding text color */
   --card: 260 40% 7%;
   --card-foreground: 40 6% 95%;
+
+  /* Muted UI elements and muted text */
   --muted: 260 25% 14%;
   --muted-foreground: 250 10% 62%;
 
-  --primary: 243 75% 59%; /* indigo-500 */
+  /* Primary brand color: indigo */
+  --primary: 243 75% 59%;
   --primary-foreground: 0 0% 100%;
-  --accent: 271 81% 56%; /* purple-500 */
+
+  /* Accent brand color: purple */
+  --accent: 271 81% 56%;
   --accent-foreground: 0 0% 100%;
 
+  /* Semantic colors used throughout the application */
   --success: 152 64% 47%;
   --warning: 38 92% 55%;
   --danger: 0 72% 58%;
 
+  /* Borders, form inputs, and focus rings */
   --border: 250 30% 18%;
   --input: 250 30% 18%;
   --ring: 243 75% 59%;
 
+  /* Default border-radius used by UI components */
   --radius: 0.75rem;
 
+  /* Forces the browser to use dark-mode UI controls and styling */
   color-scheme: dark;
 }
 
+/*
+ * Apply the application's border color to every element.
+ *
+ * `hsl(var(--border))` converts the HSL triplet stored in the
+ * `--border` variable into a usable CSS color.
+ */
 * {
   border-color: hsl(var(--border));
 }
 
+/*
+ * Enable smooth scrolling when navigating between sections using
+ * anchor links or programmatic scrolling.
+ */
 html {
   scroll-behavior: smooth;
 }
 
+/*
+ * ============================================================================
+ * GLOBAL BODY STYLES
+ * ============================================================================
+ *
+ * Defines the base appearance and typography for the entire application.
+ */
 body {
+  /* Remove the browser's default body margin */
   margin: 0;
+
+  /* Use the application's dark background color */
   background-color: hsl(var(--background));
+
+  /* Set the default text color */
   color: hsl(var(--foreground));
+
+  /*
+   * Prefer Geist as the primary application font.
+   * Fall back to the system UI font and then the generic sans-serif font.
+   */
   font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+
+  /* Improve font rendering on WebKit-based browsers */
   -webkit-font-smoothing: antialiased;
+
+  /* Improve text rendering and readability */
   text-rendering: optimizeLegibility;
 }
 
-/* ---------------------------------------------------------------------------
-   Liquid glass — translucent panel with a luminous inset border (MotionSites)
---------------------------------------------------------------------------- */
+/*
+ * ============================================================================
+ * LIQUID GLASS
+ * ============================================================================
+ *
+ * Creates a lightweight glassmorphism surface.
+ *
+ * The effect combines:
+ * - Very subtle transparency
+ * - Background blending
+ * - Backdrop blur
+ * - An inset highlight
+ * - A custom luminous gradient border created with ::before
+ */
 .liquid-glass {
+  /* Nearly transparent white surface */
   background: rgba(255, 255, 255, 0.01);
+
+  /* Blend the translucent surface with the content behind it */
   background-blend-mode: luminosity;
+
+  /* Blur content visible behind the element */
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+
+  /* Border is generated separately using the ::before pseudo-element */
   border: none;
+
+  /* Adds a subtle highlight along the top inside edge */
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+
+  /* Required so the pseudo-element can be positioned relative to this box */
   position: relative;
+
+  /* Prevent pseudo-element effects from overflowing the element */
   overflow: hidden;
 }
+
+/*
+ * Creates the luminous gradient border for `.liquid-glass`.
+ *
+ * Instead of using a normal border, a pseudo-element is positioned over the
+ * entire element and masked so only the outer gradient remains visible.
+ */
 .liquid-glass::before {
+  /* Required for generated pseudo-element content */
   content: "";
+
+  /* Cover the entire parent element */
   position: absolute;
   inset: 0;
+
+  /* Follow the parent's border radius */
   border-radius: inherit;
+
+  /*
+   * Controls the thickness of the generated border.
+   * The background gradient is painted inside this area.
+   */
   padding: 1.4px;
+
+  /*
+   * Vertical white-to-transparent gradient.
+   *
+   * Stronger highlights appear near the top and bottom edges,
+   * while the middle remains mostly transparent.
+   */
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.45) 0%,
@@ -76,55 +183,147 @@ body {
     rgba(255, 255, 255, 0.15) 80%,
     rgba(255, 255, 255, 0.45) 100%
   );
+
+  /*
+   * Creates a mask consisting of:
+   * 1. The content box
+   * 2. The full element box
+   *
+   * Together with `xor`, this removes the center and leaves
+   * only the generated border area visible.
+   */
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
+
+  /* WebKit implementation of the XOR masking operation */
   -webkit-mask-composite: xor;
+
+  /* Standard mask-composite implementation */
   mask-composite: exclude;
+
+  /* Ensures the decorative border does not intercept mouse events */
   pointer-events: none;
 }
 
-/* Slightly heavier glass for cards/surfaces */
+/*
+ * ============================================================================
+ * GLASS PANEL
+ * ============================================================================
+ *
+ * A heavier glassmorphism surface intended for cards and larger UI panels.
+ *
+ * Compared with `.liquid-glass`, this component:
+ * - Uses a stronger translucent background
+ * - Uses more backdrop blur
+ * - Has a subtle physical border
+ * - Adds an external shadow for depth
+ */
 .glass-panel {
+  /* Slightly more visible translucent surface */
   background: rgba(255, 255, 255, 0.025);
+
+  /* Stronger blur for content behind the panel */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+
+  /* Subtle visible border around the panel */
   border: 1px solid rgba(255, 255, 255, 0.06);
+
+  /*
+   * Two-layer shadow:
+   *
+   * 1. Inset highlight gives the panel a glass-like top edge.
+   * 2. Outer shadow separates the panel from the dark background.
+   */
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.06),
     0 8px 40px -12px rgba(0, 0, 0, 0.6);
 }
 
-/* ---- Gradient brand text (indigo → purple → amber) ---- */
+/*
+ * ============================================================================
+ * GRADIENT BRAND TEXT
+ * ============================================================================
+ *
+ * Applies a horizontal brand gradient transitioning from:
+ * indigo → purple → amber.
+ *
+ * The background is clipped to the text itself, making the text appear
+ * as though it is filled with the gradient.
+ */
 .gradient-text {
   background-image: linear-gradient(to left, #6366f1, #a855f7, #fcd34d);
+
+  /* Clip the background gradient to the text shape */
   -webkit-background-clip: text;
   background-clip: text;
+
+  /* Make the actual text transparent so the gradient is visible */
   color: transparent;
 }
 
+/*
+ * ============================================================================
+ * DISPLAY FONT
+ * ============================================================================
+ *
+ * Used for headings and prominent display text.
+ *
+ * General Sans is preferred, with Geist and the generic sans-serif font
+ * serving as fallbacks.
+ */
 .font-display {
   font-family: "General Sans", "Geist", sans-serif;
 }
 
-/* Custom scrollbar */
+/*
+ * ============================================================================
+ * CUSTOM SCROLLBAR
+ * ============================================================================
+ *
+ * Customizes the scrollbar appearance for WebKit-based browsers such as
+ * Chrome, Edge, and Safari.
+ */
+
+/* Overall scrollbar dimensions */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
+
+/* Scrollbar track */
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Scrollbar thumb */
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
   border-radius: 999px;
 }
+
+/*
+ * Change the scrollbar thumb when the user hovers over it,
+ * using the application's muted theme color.
+ */
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted));
 }
 
-/* Marquee mask edges */
+/*
+ * ============================================================================
+ * MARQUEE MASK
+ * ============================================================================
+ *
+ * Adds fade-out effects to the left and right edges of a horizontally
+ * scrolling marquee.
+ *
+ * The center remains fully visible while the edges gradually become
+ * transparent, creating a smooth "fade into the background" effect.
+ */
 .marquee-mask {
+  /* WebKit-specific mask implementation */
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
@@ -132,6 +331,8 @@ body {
     #000 88%,
     transparent
   );
+
+  /* Standard CSS mask implementation */
   mask-image: linear-gradient(
     to right,
     transparent,
