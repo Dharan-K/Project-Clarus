@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 /**
- * Navigation item configuration.
+ * Navigation items configuration.
  *
  * Each item supports either:
  * - `to`   → Internal application route handled by React Router.
