@@ -32,7 +32,7 @@ in-policy invoices are paid straight through; and anything with an exception is
 classified, explained, and routed to a human reviewer who approves, rejects, or
 escalates.
 
-**UiPath Maestro orchestrates the entire flow** and keeps a human in charge at
+**UiPath Maestro orchestrates with the entire flow** and keeps a human in charge at
 every money-moving decision.
 
 > 🟢 **Status:** runs end-to-end on UiPath — Maestro BPMN process → live agent
